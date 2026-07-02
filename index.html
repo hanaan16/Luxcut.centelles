@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BarberOS — Gestión de Barbería</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BarberOS">
+<meta name="theme-color" content="#0B0C0E">
+<title>BarberOS — Luxcut</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -395,9 +399,50 @@ input:checked+.sw-s:before{transform:translateX(18px);background:var(--plata-cla
 .cierre-metodo-btns{display:flex;gap:3px;flex-shrink:0;}
 .cmb{padding:6px 10px;border-radius:6px;border:1px solid var(--borde);background:var(--surface3);color:var(--texto-dim);font-size:11px;cursor:pointer;transition:all .15s;font-weight:700;white-space:nowrap;}
 .cmb:hover{border-color:var(--plata-oscuro);color:var(--texto);}
+/* ===== LOGIN ===== */
+#pantalla-login{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.login-box{background:var(--surface);border:1px solid var(--borde2);border-radius:14px;padding:40px 36px;width:340px;max-width:94vw;text-align:center;box-shadow:var(--sombra);position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--plata-oscuro),var(--plata-claro),var(--plata-oscuro));}
+.login-logo{font-size:44px;margin-bottom:12px;}
+.login-marca{font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:3px;color:var(--plata-claro);margin-bottom:4px;}
+.login-sub{font-size:11px;color:var(--texto-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px;}
+.login-error{font-size:12px;color:var(--rojo);margin-top:8px;min-height:18px;}
+/* ===== RECURRENTES ===== */
+.rec-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#A855F7;font-size:9px;font-weight:700;text-transform:uppercase;}
+/* ===== PREVISIÓN / CIERRE ===== */
+.prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px;}
+.prev-card{background:var(--surface2);border:1px solid var(--borde);border-radius:8px;padding:12px;text-align:center;}
+.prev-card .pv-ico{font-size:20px;margin-bottom:4px;}
+.prev-card .pv-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--texto-dim);margin-bottom:4px;}
+.prev-card .pv-val{font-family:'Bebas Neue',cursive;font-size:24px;color:var(--plata);}
+.prev-card .pv-sub{font-size:10px;color:var(--texto-dim);margin-top:2px;}
+.cierre-sem-card{background:var(--surface2);border:1px solid var(--borde);border-radius:8px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s;}
+.cierre-sem-card:hover{background:var(--surface3);border-color:var(--borde2);}
+.cs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cs-rango{font-size:12px;font-weight:600;color:var(--texto);}
+.cs-total{font-family:'Bebas Neue',cursive;font-size:22px;color:var(--plata);}
+.cs-bars{display:flex;align-items:flex-end;gap:4px;height:40px;}
+.cs-bar{flex:1;background:linear-gradient(180deg,var(--plata),var(--plata-oscuro));border-radius:2px 2px 0 0;min-height:2px;}
+.cs-bar.cs-max{background:linear-gradient(180deg,var(--plata-claro),var(--plata));}
 </style>
 </head>
 <body>
+
+<!-- PANTALLA DE LOGIN -->
+<div id="pantalla-login">
+  <div class="login-box">
+    <div class="login-logo">✂</div>
+    <div class="login-marca" id="login-marca-txt">BarberOS</div>
+    <div class="login-sub">Panel de gestión</div>
+    <div class="fg"><label>Contraseña</label>
+      <input type="password" id="login-pwd" placeholder="Introduce la contraseña"
+        style="text-align:center;font-size:16px;letter-spacing:2px;"
+        onkeydown="if(event.key==='Enter')hacerLogin()">
+    </div>
+    <button class="btn-p" onclick="hacerLogin()" style="margin-top:4px;">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
 
 <aside class="sidebar">
   <div class="sb-logo" onclick="abrirPerfil()">
@@ -436,6 +481,8 @@ input:checked+.sw-s:before{transform:translateX(18px);background:var(--plata-cla
     <a data-sec="finanzas" data-modo="admin,barbero" onclick="ir('finanzas')"><span class="ni">💰</span>Ingresos y Gastos</a>
     <hr class="nav-sep" data-modo="admin">
     <a data-sec="estadisticas" data-modo="admin" onclick="ir('estadisticas')"><span class="ni">📉</span>Estadísticas</a>
+    <a data-sec="prevision" data-modo="admin" onclick="ir('prevision')"><span class="ni">🔮</span>Previsión</a>
+    <a data-sec="cierresem" data-modo="admin" onclick="ir('cierresem')"><span class="ni">📊</span>Cierre semanal</a>
     <a data-sec="notas" data-modo="admin,barbero" onclick="ir('notas')"><span class="ni">📝</span>Notas del día</a>
     <a data-sec="pedidos" data-modo="admin" onclick="ir('pedidos')"><span class="ni">🛒</span>Pedidos</a>
     <hr class="nav-sep" data-modo="admin">
@@ -526,6 +573,20 @@ input:checked+.sw-s:before{transform:translateX(18px);background:var(--plata-cla
           <div class="fg"><label>Servicio</label><select id="f-s"></select></div>
           <div class="fg" id="fg-f-barbero" style="display:none;"><label>Barbero</label><select id="f-barbero"></select></div>
           <div class="fg"><label>Notas</label><input type="text" id="f-o" placeholder="Opcional…"></div>
+          <div class="fg">
+            <label>Repetir cita</label>
+            <select id="f-recur">
+              <option value="">No repetir</option>
+              <option value="7">Cada semana</option>
+              <option value="14">Cada 2 semanas</option>
+              <option value="21">Cada 3 semanas</option>
+              <option value="28">Cada 4 semanas</option>
+            </select>
+          </div>
+          <div class="fg" id="fg-f-recur-fin" style="display:none;">
+            <label>Repetir hasta</label>
+            <input type="date" id="f-recur-fin">
+          </div>
           <input type="hidden" id="f-c">
           <button class="btn-p" onclick="guardarCitaR()">Guardar cita</button>
           <div style="margin-top:10px;">
@@ -651,6 +712,38 @@ input:checked+.sw-s:before{transform:translateX(18px);background:var(--plata-cla
     </div>
   </section>
 
+  <!-- PREVISIÓN DE INGRESOS -->
+  <section class="seccion" id="sec-prevision">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+      <h2 style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:var(--texto-mid);">Previsión de ingresos</h2>
+      <span style="font-size:12px;color:var(--texto-dim);">Basada en citas ya agendadas y tu tarifa de servicios</span>
+    </div>
+    <div class="prev-grid" id="prev-kpis"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="card-tit">📅 Previsión por día — próximos 7 días</div>
+        <div id="prev-dias" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-tit">✂ Servicios pendientes de cobrar</div>
+        <div id="prev-servicios" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIERRE SEMANAL -->
+  <section class="seccion" id="sec-cierresem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <h2 style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:var(--texto-mid);">Cierre semanal</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-p sm" onclick="exportarCierreSemana()">⬇ Exportar semana actual</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;" id="cierre-sem-actual"></div>
+    <div class="card-tit" style="margin-bottom:10px;">Historial de semanas anteriores</div>
+    <div id="cierre-sem-historial"></div>
+  </section>
+
   <!-- LISTA DE ESPERA -->
   <section class="seccion" id="sec-espera">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
@@ -737,12 +830,18 @@ input:checked+.sw-s:before{transform:translateX(18px);background:var(--plata-cla
         <p style="font-size:12px;color:var(--texto-dim);margin-bottom:14px;">
           El modo "Recepción / Barbero" limita lo que se ve en el menú lateral. Marca abajo qué secciones puede usar el barbero — los cambios se aplican al instante. Protégelo con un PIN para que solo tú puedas volver a modo Administrador.
         </p>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
-          <div class="fg" style="margin:0;flex:1;min-width:220px;"><label>PIN de administrador (4-8 dígitos)</label><input type="password" id="cfg-pin" maxlength="8" inputmode="numeric" placeholder="Déjalo vacío para no pedir PIN"></div>
-          <div style="display:flex;align-items:flex-end;gap:8px;">
-            <button class="btn-p" onclick="guardarPin()">Guardar PIN</button>
-            <button class="btn-s" onclick="abrirModalPlantillas()">💬 Plantillas WhatsApp</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="fg" style="margin:0;">
+            <label>🔐 Contraseña de acceso a la app</label>
+            <input type="password" id="cfg-login-pwd" maxlength="30" placeholder="Déjalo vacío para no pedir contraseña">
+            <div style="font-size:10px;color:var(--texto-dim);margin-top:3px;">Se pide al abrir la URL en cualquier dispositivo.</div>
           </div>
+          <div class="fg" style="margin:0;"><label>🔒 PIN de administrador (4-8 dígitos)</label><input type="password" id="cfg-pin" maxlength="8" inputmode="numeric" placeholder="Para volver de modo barbero a admin"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button class="btn-p sm" onclick="guardarLoginPwd()">Guardar contraseña de acceso</button>
+          <button class="btn-p sm" onclick="guardarPin()">Guardar PIN</button>
+          <button class="btn-s" onclick="abrirModalPlantillas()">💬 Plantillas WhatsApp</button>
         </div>
 
         <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--texto-dim);margin-bottom:10px;">
@@ -1200,6 +1299,7 @@ function cargar(){
   };
   if(E.cfg.pin===undefined)E.cfg.pin='';
   if(!E.permisosBarbero)E.permisosBarbero=['agenda','clientes','espera','recordatorios','finanzas','notas'];
+  if(E.cfg.loginPwd===undefined)E.cfg.loginPwd='';
   if(!E.clientes.length)demoData();
 }
 
@@ -1297,7 +1397,7 @@ function toggleModo(){E.modo=E.modo==='dark'?'light':'dark';aplicarModo();guarda
 function aplicarModo(){document.documentElement.setAttribute('data-theme',E.modo);document.getElementById('btn-modo').textContent=E.modo==='dark'?'☀️':'🌙';}
 
 // ============ NAVEGACIÓN ============
-const TITS={dashboard:'Dashboard',agenda:'Agenda',clientes:'Clientes',habituales:'Habituales',finanzas:'Ingresos y Gastos',estadisticas:'Estadísticas',notas:'Notas del día',pedidos:'Pedidos',espera:'Lista de espera',recordatorios:'Recordatorios',configuracion:'Configuración'};
+const TITS={dashboard:'Dashboard',agenda:'Agenda',clientes:'Clientes',habituales:'Habituales',finanzas:'Ingresos y Gastos',estadisticas:'Estadísticas',prevision:'Previsión de ingresos',cierresem:'Cierre semanal',notas:'Notas del día',pedidos:'Pedidos',espera:'Lista de espera',recordatorios:'Recordatorios',configuracion:'Configuración'};
 function ir(id){
   document.querySelectorAll('.seccion').forEach(s=>s.classList.remove('activa'));
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
@@ -1315,6 +1415,8 @@ function ir(id){
   if(id==='notas'){renderNotas();nuevaNota();}
   if(id==='pedidos'){setPedTab('pedido');}
   if(id==='espera'){renderEspera();}
+  if(id==='prevision'){renderPrevision();}
+  if(id==='cierresem'){renderCierreSemanal();}
   if(id==='recordatorios'){recordOffset=1;renderRecordatorios();}
 }
 
@@ -1563,14 +1665,42 @@ function guardarCitaR(){
   const hora=document.getElementById('f-h').value;const nombre=document.getElementById('f-n').value.trim();
   const tel=document.getElementById('f-t').value.trim();const serv=document.getElementById('f-s').value;
   const notas=document.getElementById('f-o').value.trim();let cid=document.getElementById('f-c').value;
+  const recurDias=parseInt(document.getElementById('f-recur')?.value)||0;
+  const recurFin=document.getElementById('f-recur-fin')?.value||'';
   const dia=E.diaS;
   if(!hora||!nombre){notif('Indica hora y nombre','⚠️');return;}
   if(E.citas.find(c=>c.fecha===dia&&c.hora===hora)){notif('Ese horario ya está ocupado','⚠️');return;}
   if(!cid){let ex=E.clientes.find(c=>c.nombre.toLowerCase()===nombre.toLowerCase());if(ex){cid=ex.id;if(tel&&!ex.telefono)ex.telefono=tel;}else{const nc={id:uid(),nombre,telefono:tel,email:'',notas:'',creadoEn:new Date().toISOString()};E.clientes.push(nc);cid=nc.id;}}
-  E.citas.push({id:uid(),clienteId:cid,fecha:dia,hora,servicio:serv,notas,barberoId:typeof getBarberoParaCita==='function'?getBarberoParaCita():'b-principal'});
-  guardar();limpF();renderSlots();renderSem();notif(`Cita: ${nombre} a las ${hora}`);
+  const barberoId=typeof getBarberoParaCita==='function'?getBarberoParaCita():'b-principal';
+  const recurGrupoId=recurDias?uid():null;
+  // Crear cita inicial
+  E.citas.push({id:uid(),clienteId:cid,fecha:dia,hora,servicio:serv,notas,barberoId,recurGrupoId});
+  // Crear citas recurrentes si aplica
+  let citasCreadas=1;
+  if(recurDias&&recurFin){
+    let fechaActual=new Date(dia+'T00:00:00');
+    const fechaLimite=new Date(recurFin+'T00:00:00');
+    while(true){
+      fechaActual.setDate(fechaActual.getDate()+recurDias);
+      if(fechaActual>fechaLimite)break;
+      const fs2=fStr(fechaActual);
+      if(!E.citas.find(c=>c.fecha===fs2&&c.hora===hora)){
+        E.citas.push({id:uid(),clienteId:cid,fecha:fs2,hora,servicio:serv,notas,barberoId,recurGrupoId});
+        citasCreadas++;
+      }
+    }
+  }
+  guardar();limpF();renderSlots();renderSem();
+  if(citasCreadas>1)notif(`${citasCreadas} citas creadas (recurrente cada ${recurDias} días)`,'🔄');
+  else notif(`Cita: ${nombre} a las ${hora}`);
 }
-function limpF(){['f-h','f-n','f-t','f-o','f-c'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('ac-f').style.display='none';}
+function limpF(){
+  ['f-h','f-n','f-t','f-o','f-c'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const fr=document.getElementById('f-recur');if(fr)fr.value='';
+  const frf=document.getElementById('f-recur-fin');if(frf)frf.value='';
+  const fgfrf=document.getElementById('fg-f-recur-fin');if(fgfrf)fgfrf.style.display='none';
+  document.getElementById('ac-f').style.display='none';
+}
 function abrirModalCita(){
   document.getElementById('mc-f').value=E.diaS||fStr(new Date());
   document.getElementById('mc-h').value='';
@@ -3250,9 +3380,15 @@ function init(){
       <div class="fg"><label>Teléfono (opcional)</label><input type="tel" id="walkin-tel" placeholder="600 000 000"></div>
     </div>
 
-    <div class="fg">
-      <label>Hora del servicio</label>
-      <input type="time" id="walkin-hora" step="1800">
+    <div class="cols2">
+      <div class="fg">
+        <label>Fecha del servicio</label>
+        <input type="date" id="walkin-fecha">
+      </div>
+      <div class="fg">
+        <label>Hora del servicio</label>
+        <input type="time" id="walkin-hora" step="1800">
+      </div>
     </div>
     <div class="fg">
       <label>Servicio realizado</label>
@@ -3816,7 +3952,8 @@ function abrirWalkIn(){
   document.getElementById('walkin-tel').value='';
   document.getElementById('walkin-cid').value='';
   document.getElementById('ac-walkin').style.display='none';
-  // Hora actual redondeada a 30 min
+  // Fecha y hora actuales
+  document.getElementById('walkin-fecha').value=fStr(new Date());
   const ahora=new Date();
   const mins=ahora.getMinutes()<30?'00':'30';
   document.getElementById('walkin-hora').value=
@@ -3877,11 +4014,12 @@ function selWalkinMetodo(met){
 }
 function confirmarWalkin(){
   const anonimo=document.getElementById('walkin-anonimo').checked;
+  const fechaWI=document.getElementById('walkin-fecha').value||fStr(new Date());
   const hora=document.getElementById('walkin-hora').value||new Date().toTimeString().slice(0,5);
   const srv=document.getElementById('walkin-srv').value;
   const precio=parseFloat(document.getElementById('walkin-precio').value);
   const met=E.walkinMetodoSel;
-  const hoy=fStr(new Date());
+  const hoy=fechaWI; // puede ser hoy u otro día
 
   if(!met){notif('Selecciona método de pago','⚠️');return;}
   if(!srv){notif('Indica el servicio','⚠️');return;}
@@ -3964,6 +4102,8 @@ const SECCIONES_CONFIGURABLES=[
   {id:'recordatorios',ico:'🔔',nombre:'Recordatorios'},
   {id:'finanzas',ico:'💰',nombre:'Ingresos y Gastos'},
   {id:'estadisticas',ico:'📉',nombre:'Estadísticas'},
+  {id:'prevision',ico:'🔮',nombre:'Previsión'},
+  {id:'cierresem',ico:'📊',nombre:'Cierre semanal'},
   {id:'notas',ico:'📝',nombre:'Notas del día'},
   {id:'pedidos',ico:'🛒',nombre:'Pedidos'},
   {id:'configuracion',ico:'⚙️',nombre:'Configuración'}
@@ -4071,16 +4211,250 @@ function cargarRolSesion(){
 
 // ---- POST-INIT: activar módulos nuevos ----
 document.addEventListener('DOMContentLoaded',()=>{
+  // Show/hide recurring end date
+  const fRecur=document.getElementById('f-recur');
+  if(fRecur)fRecur.addEventListener('change',()=>{
+    const fg=document.getElementById('fg-f-recur-fin');
+    if(fg)fg.style.display=fRecur.value?'block':'none';
+  });
   setTimeout(()=>{
     if(!E.listaEspera)E.listaEspera=[];
     actualizarVisBarbero();
     inyectarDashExtras();
-    renderDash();
-    // Restaurar rol de la sesión (no persiste entre sesiones nuevas por seguridad)
-    const rolGuardado=cargarRolSesion();
-    aplicarRol(rolGuardado);
+    // LOGIN: mostrar pantalla si hay contraseña configurada
+    const loginEl=document.getElementById('pantalla-login');
+    if(loginEl){
+      if(E.cfg.loginPwd&&!sessionStorage.getItem('bos_logueado')){
+        loginEl.style.display='flex';
+        // Actualizar marca en pantalla login
+        const marca=document.getElementById('login-marca-txt');
+        if(marca)marca.textContent=E.cfg.nombre||'BarberOS';
+      }else{
+        loginEl.style.display='none';
+        renderDash();
+        const rolGuardado=cargarRolSesion();
+        aplicarRol(rolGuardado);
+      }
+    }
   },80);
 });
+
+// ===== LOGIN =====
+function hacerLogin(){
+  const pwd=document.getElementById('login-pwd').value;
+  const err=document.getElementById('login-error');
+  if(!E.cfg.loginPwd||pwd===E.cfg.loginPwd){
+    sessionStorage.setItem('bos_logueado','1');
+    document.getElementById('pantalla-login').style.display='none';
+    renderDash();
+    aplicarRol(cargarRolSesion());
+    err.textContent='';
+  }else{
+    err.textContent='Contraseña incorrecta. Inténtalo de nuevo.';
+    document.getElementById('login-pwd').value='';
+    document.getElementById('login-pwd').focus();
+  }
+}
+
+// ===== CONTRASEÑA DE ACCESO EN CONFIGURACIÓN =====
+// Se añade a la tarjeta de Accesos — se llama desde renderCfg
+function renderLoginPwd(){
+  const el=document.getElementById('cfg-login-pwd');
+  if(!el)return;
+  el.value='';// no mostrar pwd actual por seguridad
+}
+function guardarLoginPwd(){
+  const pwd=document.getElementById('cfg-login-pwd')?.value?.trim();
+  if(pwd===undefined)return;
+  E.cfg.loginPwd=pwd;
+  guardar();
+  document.getElementById('cfg-login-pwd').value='';
+  notif(pwd?'Contraseña de acceso guardada':'Contraseña eliminada — acceso libre','🔐');
+}
+
+// ===== RECURRENTES: badge en slot =====
+// El badge se inyecta en renderSlots tras crear los slots — integrado en renderSlots del primer script
+// Aquí añadimos la función helper que comprueba si una cita es recurrente
+function esCitaRecurrente(citaId){
+  const c=E.citas.find(x=>x.id===citaId);
+  return c&&c.recurGrupoId?true:false;
+}
+function citasDelGrupo(grupoId){
+  return E.citas.filter(c=>c.recurGrupoId===grupoId).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+}
+function eliminarGrupoRecurrente(grupoId){
+  const citas=citasDelGrupo(grupoId);
+  const futuras=citas.filter(c=>c.fecha>=fStr(new Date()));
+  if(!confirm(`¿Eliminar las ${futuras.length} citas futuras de esta serie recurrente?`))return;
+  E.citas=E.citas.filter(c=>c.recurGrupoId!==grupoId||c.fecha<fStr(new Date()));
+  guardar();renderSlots();renderSem();notif(`${futuras.length} citas recurrentes eliminadas`,'🗑');
+}
+
+// ===== PREVISIÓN DE INGRESOS =====
+function renderPrevision(){
+  const hoy=new Date();const hoyStr=fStr(hoy);
+  // Próximos 7 días
+  const dias=[];
+  for(let i=0;i<=7;i++){const d=new Date(hoy);d.setDate(d.getDate()+i);dias.push(fStr(d));}
+
+  // KPIs
+  const citasFuturas=E.citas.filter(c=>c.fecha>=hoyStr&&!esCitaCobrada(c.id));
+  const prevTotal=citasFuturas.reduce((a,c)=>{const s=E.cfg.servicios.find(x=>x.nombre===c.servicio);return a+(s?s.precio:0);},0);
+  const citasSem=citasFuturas.filter(c=>dias.includes(c.fecha));
+  const prevSem=citasSem.reduce((a,c)=>{const s=E.cfg.servicios.find(x=>x.nombre===c.servicio);return a+(s?s.precio:0);},0);
+  const ingHoy=E.movimientos.filter(m=>m.fecha===hoyStr&&m.tipo==='ingreso').reduce((a,m)=>a+m.importe,0);
+  const citasHoy=E.citas.filter(c=>c.fecha===hoyStr);
+  const prevHoy=citasHoy.filter(c=>!esCitaCobrada(c.id)).reduce((a,c)=>{const s=E.cfg.servicios.find(x=>x.nombre===c.servicio);return a+(s?s.precio:0);},0);
+
+  document.getElementById('prev-kpis').innerHTML=`
+    <div class="prev-card"><div class="pv-ico">💰</div><div class="pv-lbl">Facturado hoy</div><div class="pv-val">${ingHoy.toFixed(0)}€</div><div class="pv-sub">cobrado</div></div>
+    <div class="prev-card"><div class="pv-ico">⏳</div><div class="pv-lbl">Pendiente hoy</div><div class="pv-val">${prevHoy.toFixed(0)}€</div><div class="pv-sub">${citasHoy.filter(c=>!esCitaCobrada(c.id)).length} citas</div></div>
+    <div class="prev-card"><div class="pv-ico">📅</div><div class="pv-lbl">Previsión 7 días</div><div class="pv-val">${prevSem.toFixed(0)}€</div><div class="pv-sub">${citasSem.length} citas</div></div>
+    <div class="prev-card"><div class="pv-ico">🔮</div><div class="pv-lbl">Total pendiente</div><div class="pv-val">${prevTotal.toFixed(0)}€</div><div class="pv-sub">${citasFuturas.length} citas</div></div>
+  `;
+
+  // Por día
+  const prevDias=document.getElementById('prev-dias');
+  prevDias.innerHTML=dias.map(d=>{
+    const dd=new Date(d+'T00:00:00');
+    const citas=E.citas.filter(c=>c.fecha===d);
+    const ingresado=E.movimientos.filter(m=>m.fecha===d&&m.tipo==='ingreso').reduce((a,m)=>a+m.importe,0);
+    const previsto=citas.reduce((a,c)=>{const s=E.cfg.servicios.find(x=>x.nombre===c.servicio);return a+(s?s.precio:0);},0);
+    const esHoy=d===hoyStr;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid ${esHoy?'var(--plata-oscuro)':'var(--borde)'};border-radius:7px;">
+      <div style="min-width:110px;">
+        <div style="font-size:12px;font-weight:600;color:${esHoy?'var(--plata)':'var(--texto)'};">${dd.toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'})}${esHoy?' <span style="font-size:9px;color:var(--plata);">HOY</span>':''}</div>
+        <div style="font-size:10px;color:var(--texto-dim);">${citas.length} cita${citas.length!==1?'s':''}</div>
+      </div>
+      <div style="flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;">
+        ${previsto>0?`<div style="height:100%;width:${Math.min(Math.round(ingresado/previsto*100),100)}%;background:var(--verde);border-radius:3px;"></div>`:''}
+      </div>
+      <div style="text-align:right;min-width:90px;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:16px;color:var(--plata);">${previsto.toFixed(0)}€</div>
+        ${ingresado>0?`<div style="font-size:10px;color:var(--verde);">✓ ${ingresado.toFixed(0)}€ cobrado</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Servicios pendientes
+  const srvPend=document.getElementById('prev-servicios');
+  const ct={};
+  citasFuturas.forEach(c=>{ct[c.servicio]=(ct[c.servicio]||{n:0,total:0});ct[c.servicio].n++;const s=E.cfg.servicios.find(x=>x.nombre===c.servicio);ct[c.servicio].total+=(s?s.precio:0);});
+  const srvArr=Object.entries(ct).sort((a,b)=>b[1].total-a[1].total);
+  const maxTotal=srvArr[0]?srvArr[0][1].total:1;
+  srvPend.innerHTML=srvArr.length?srvArr.map(([srv,{n,total}])=>`
+    <div style="padding:9px 12px;background:var(--surface2);border:1px solid var(--borde);border-radius:7px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:600;">✂ ${srv}</span>
+        <span style="font-family:'Bebas Neue',cursive;font-size:16px;color:var(--plata);">${total.toFixed(0)}€ <span style="font-size:10px;color:var(--texto-dim);">(${n} cita${n!==1?'s':''})</span></span>
+      </div>
+      <div style="height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${Math.round(total/maxTotal*100)}%;background:linear-gradient(90deg,var(--plata-oscuro),var(--plata));border-radius:3px;"></div>
+      </div>
+    </div>`).join(''):'<div class="empty" style="padding:20px 0;"><div class="empty-ico">✅</div>No hay citas pendientes de cobrar</div>';
+}
+
+// ===== CIERRE SEMANAL =====
+function getLunesSemana(offsetSem){
+  const hoy=new Date();const dow=hoy.getDay();const diff=dow===0?-6:1-dow;
+  const lun=new Date(hoy);lun.setDate(lun.getDate()+diff+offsetSem*7);lun.setHours(0,0,0,0);return lun;
+}
+function getInfoSemana(lunes){
+  const sab=new Date(lunes);sab.setDate(sab.getDate()+5);
+  const fechas=[];for(let i=0;i<6;i++){const d=new Date(lunes);d.setDate(d.getDate()+i);fechas.push(fStr(d));}
+  const citas=E.citas.filter(c=>fechas.includes(c.fecha));
+  const movs=E.movimientos.filter(m=>fechas.includes(m.fecha)&&m.tipo==='ingreso');
+  const gastos=E.movimientos.filter(m=>fechas.includes(m.fecha)&&m.tipo==='gasto');
+  const ingresos=movs.reduce((a,m)=>a+m.importe,0);
+  const totalGastos=gastos.reduce((a,m)=>a+m.importe,0);
+  const porDia=fechas.map(f=>({fecha:f,citas:E.citas.filter(c=>c.fecha===f).length,ingresos:E.movimientos.filter(m=>m.fecha===f&&m.tipo==='ingreso').reduce((a,m)=>a+m.importe,0)}));
+  return{lunes,sab,fechas,citas,ingresos,totalGastos,porDia,balance:ingresos-totalGastos};
+}
+function renderCierreSemanal(){
+  const semActual=getInfoSemana(getLunesSemana(0));
+  renderCardCierre(semActual,document.getElementById('cierre-sem-actual'),true);
+  const hist=document.getElementById('cierre-sem-historial');
+  hist.innerHTML='';
+  for(let i=1;i<=8;i++){
+    const info=getInfoSemana(getLunesSemana(-i));
+    if(!info.citas.length&&!info.ingresos)continue;
+    const card=document.createElement('div');
+    renderCardCierre(info,card,false);
+    hist.appendChild(card);
+  }
+}
+function renderCardCierre(info,cont,esActual){
+  const {lunes,sab,citas,ingresos,totalGastos,balance,porDia}=info;
+  const rango=lunes.toLocaleDateString('es-ES',{day:'numeric',month:'short'})+' – '+sab.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+  const maxIng=Math.max(...porDia.map(d=>d.ingresos),1);
+  const bars=porDia.map(d=>{const h=Math.max(Math.round(d.ingresos/maxIng*36),d.ingresos>0?4:1);return`<div class="cs-bar ${d.ingresos===maxIng&&d.ingresos>0?'cs-max':''}" style="height:${h}px;" title="${fmtF(d.fecha)}: ${d.ingresos.toFixed(0)}€"></div>`;}).join('');
+  cont.className='cierre-sem-card';
+  cont.innerHTML=`
+    <div class="cs-top">
+      <div>
+        <div class="cs-rango">${esActual?'<span style="color:var(--plata);font-size:11px;">SEMANA ACTUAL — </span>':''}${rango}</div>
+        <div style="font-size:11px;color:var(--texto-dim);margin-top:2px;">${citas.length} cita${citas.length!==1?'s':''} · Balance: <span style="color:${balance>=0?'var(--verde)':'var(--rojo)'};">${balance>=0?'+':''}${balance.toFixed(2)}€</span></div>
+      </div>
+      <div style="text-align:right;">
+        <div class="cs-total">${ingresos.toFixed(0)}€</div>
+        ${totalGastos>0?`<div style="font-size:10px;color:var(--rojo);">−${totalGastos.toFixed(0)}€ gastos</div>`:''}
+      </div>
+    </div>
+    <div class="cs-bars">${bars}</div>
+    <div style="display:flex;gap:8px;margin-top:10px;font-size:11px;color:var(--texto-dim);">
+      ${['Lu','Ma','Mi','Ju','Vi','Sá'].map((d,i)=>`<span style="flex:1;text-align:center;">${d}<br><strong style="color:var(--texto);">${porDia[i]?porDia[i].citas:0}</strong></span>`).join('')}
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="btn-s" style="flex:1;" onclick="exportarCierreSemanaConFecha('${fStr(info.lunes)}')">⬇ Exportar</button>
+    </div>
+  `;
+}
+function exportarCierreSemana(){
+  exportarCierreSemanaConFecha(fStr(getLunesSemana(0)));
+}
+function exportarCierreSemanaConFecha(lunesStr){
+  const lunes=new Date(lunesStr+'T00:00:00');
+  const info=getInfoSemana(lunes);
+  const rango=fStr(lunes)+' al '+fStr(info.sab);
+  const filas=[
+    ['CIERRE SEMANAL','Semana del '+rango,'','',''],
+    ['','','','',''],
+    ['DÍA','CITAS','INGRESOS €','GASTOS €','BALANCE €']
+  ];
+  info.porDia.forEach(d=>{
+    const gas=E.movimientos.filter(m=>m.fecha===d.fecha&&m.tipo==='gasto').reduce((a,m)=>a+m.importe,0);
+    filas.push([fmtF(d.fecha),d.citas,d.ingresos.toFixed(2),gas.toFixed(2),(d.ingresos-gas).toFixed(2)]);
+  });
+  filas.push(['','','','','']);
+  filas.push(['TOTAL',info.citas.length,info.ingresos.toFixed(2),info.totalGastos.toFixed(2),info.balance.toFixed(2)]);
+  filas.push(['','','','','']);
+  filas.push(['DETALLE MOVIMIENTOS','','','','']);
+  filas.push(['Fecha','Tipo','Descripción','Importe €','Método']);
+  E.movimientos.filter(m=>info.fechas.includes(m.fecha))
+    .sort((a,b)=>a.fecha.localeCompare(b.fecha))
+    .forEach(m=>filas.push([m.fecha,m.tipo,m.desc,m.importe.toFixed(2),m.metodo]));
+  descargarCSV(filas,'cierre_semana_'+rango.replace(/ /g,'_')+'.csv');
+  notif('Cierre semanal exportado','📊');
+}
+
+// ===== PWA SERVICE WORKER =====
+function registrarSW(){
+  if('serviceWorker' in navigator){
+    const swCode=`
+const CACHE='barberos-v1';
+const ASSETS=[location.href];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).then(r=>{const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc));return r;}).catch(()=>caches.match(e.request)));});
+    `;
+    const blob=new Blob([swCode],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl,{scope:'./'})
+      .then(()=>console.log('SW registrado — modo offline activo'))
+      .catch(e=>console.log('SW no disponible:',e));
+  }
+}
+registrarSW();
 </script>
 </body>
 </html>
