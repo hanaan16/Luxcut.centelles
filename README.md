@@ -1,2 +1,0 @@
-# Luxcut.centelles
-Barberia
